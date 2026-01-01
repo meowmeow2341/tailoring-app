@@ -3,95 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Karim Tailoring</title>
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Karim Tailoring Invoice</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .blue-text { color: #0055A4; }
+        .blue-border { border: 2px solid #0055A4; }
+        @media screen { #receipt-area { margin-top: 20px; transform: scale(0.85); transform-origin: top center; } }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans">
+<body class="bg-slate-100 pb-20 font-sans">
 
-    <div class="p-6 max-w-md mx-auto no-print">
-        <h1 class="text-2xl font-bold text-blue-900 mb-6">New Invoice</h1>
-        <div class="bg-white p-6 rounded-2xl shadow-sm space-y-4">
-            <input id="cust" type="text" placeholder="Customer Name" class="w-full p-4 bg-gray-50 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
-            <input id="part" type="text" placeholder="Particulars (e.g. 4 Set Suit)" class="w-full p-4 bg-gray-50 rounded-xl outline-none">
-            <div class="flex gap-4">
-                <input id="qty" type="number" placeholder="Qty" class="w-1/2 p-4 bg-gray-50 rounded-xl outline-none">
-                <input id="prc" type="number" placeholder="Price" class="w-1/2 p-4 bg-gray-50 rounded-xl outline-none">
+    <div class="max-w-md mx-auto p-4 no-print">
+        <div class="bg-white p-6 rounded-2xl shadow-xl border-t-8 border-blue-700">
+            <h2 class="text-2xl font-black mb-6 blue-text italic">NEW INVOICE</h2>
+            <div class="space-y-4">
+                <input id="inCust" type="text" placeholder="M/s (Customer Name)" class="w-full p-4 bg-slate-50 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                <div class="flex gap-2">
+                    <div class="w-1/2">
+                        <label class="text-[10px] font-bold blue-text ml-2">ORDER DATE</label>
+                        <input id="inDate" type="date" class="w-full p-3 bg-slate-50 border rounded-xl outline-none">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="text-[10px] font-bold blue-text ml-2">DELIVERY DATE</label>
+                        <input id="inDeliv" type="date" class="w-full p-3 bg-slate-50 border rounded-xl outline-none">
+                    </div>
+                </div>
+                <hr>
+                <input id="inPart" type="text" placeholder="Particulars (Description)" class="w-full p-4 bg-slate-50 border rounded-xl outline-none">
+                <div class="flex gap-2">
+                    <input id="inQty" type="number" placeholder="Qty" class="w-1/3 p-4 bg-slate-50 border rounded-xl outline-none">
+                    <input id="inPrice" type="number" placeholder="Price/Unit" class="w-2/3 p-4 bg-slate-50 border rounded-xl outline-none">
+                </div>
+                <input id="inAdvance" type="number" placeholder="Advance Payment (Dhs)" class="w-full p-4 bg-yellow-50 border border-yellow-200 rounded-xl outline-none">
+                
+                <button onclick="downloadPDF()" class="w-full bg-blue-700 text-white font-black py-5 rounded-2xl shadow-lg active:scale-95 transition-transform uppercase tracking-widest">
+                    Download Official PDF
+                </button>
             </div>
-            <button onclick="updateAndDownload()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
-                Download Blue Receipt
-            </button>
         </div>
     </div>
 
-    <div id="receipt" class="bg-white p-8 w-[210mm] mx-auto" style="border: 2px solid #0055A4; color: #0055A4;">
-        <div class="flex justify-between items-start">
-            <div class="text-[10px] leading-tight">
-                Mob: 050 894 8579 Karim<br>Mob: 055 909 8427 Jashim<br>P.O. Box: 843, AJMAN
+    <div id="receipt-area" class="bg-white mx-auto p-10 w-[210mm] blue-border min-h-[297mm] relative">
+        <div class="flex justify-between items-start blue-text">
+            <div class="text-[11px] leading-tight font-bold">
+                Mob: 050 894 8579 Karim<br>Mob: 055 909 8427 Jashim<br>P.O. Box: 843, AJMAN, U.A.E.
             </div>
             <div class="text-center">
-                <h1 class="text-3xl font-black italic italic uppercase tracking-tighter">KARIM TAILORING</h1>
-                <p class="text-[10px] font-bold">OSMAN BIN AFFAN STREET | TAX INVOICE</p>
+                <h1 class="text-5xl font-black italic tracking-tighter">KARIM TAILORING</h1>
+                <p class="text-sm font-bold mt-1">OSMAN BIN AFFAN STREET</p>
+                <p class="text-xs font-medium">TAX INVOICE | TRN: 100296495300003</p>
             </div>
-            <div class="text-red-600 font-bold">No. 26904</div>
-        </div>
-        
-        <div class="h-[2px] bg-blue-800 my-4"></div>
-        
-        <div class="flex justify-between mb-4">
-            <div class="font-bold">M/s. <span id="rCust" class="border-b border-blue-800 min-w-[300px] inline-block"></span></div>
-            <div>Date: <span id="rDate"></span></div>
+            <div class="text-right">
+                <p class="text-red-600 font-bold text-2xl">No. 26905</p>
+                <div class="text-[11px] mt-4 font-bold text-left space-y-1">
+                    <p>Delivery Date: <span id="outDeliv" class="text-black border-b border-black inline-block min-w-[80px]"></span></p>
+                    <p>Date: <span id="outDate" class="text-black border-b border-black inline-block min-w-[80px]"></span></p>
+                </div>
+            </div>
         </div>
 
-        <table class="w-full border border-blue-800">
-            <tr class="bg-blue-50">
-                <th class="border border-blue-800 p-2">Qty</th>
-                <th class="border border-blue-800 p-2">Particulars</th>
-                <th class="border border-blue-800 p-2">VAT (5%)</th>
-                <th class="border border-blue-800 p-2">Total (Dhs)</th>
-            </tr>
-            <tr class="h-48">
-                <td id="rQty" class="border border-blue-800 p-2 text-center"></td>
-                <td id="rPart" class="border border-blue-800 p-2"></td>
-                <td id="rVat" class="border border-blue-800 p-2 text-right"></td>
-                <td id="rTotal" class="border border-blue-800 p-2 text-right"></td>
-            </tr>
+        <div class="h-[4px] bg-blue-700 my-6"></div>
+
+        <div class="mb-8 blue-text font-bold text-lg">
+            M/s. <span id="outCust" class="text-black border-b-2 border-dotted border-blue-900 min-w-[500px] inline-block px-4 italic"></span>
+        </div>
+
+        <table class="w-full border-collapse border-[3px] border-blue-700">
+            <thead>
+                <tr class="blue-text bg-blue-50 text-xs font-black">
+                    <th class="border-[2px] border-blue-700 p-2 w-20">Qty.</th>
+                    <th class="border-[2px] border-blue-700 p-2">Particulars</th>
+                    <th class="border-[2px] border-blue-700 p-2 w-20">VAT 5%</th>
+                    <th class="border-[2px] border-blue-700 p-2 w-24">VAT Amount</th>
+                    <th class="border-[2px] border-blue-700 p-2 w-32">Total (Incl. VAT)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="h-[450px] align-top text-black font-bold text-xl">
+                    <td id="outQty" class="border-[2px] border-blue-700 p-4 text-center"></td>
+                    <td id="outPart" class="border-[2px] border-blue-700 p-4"></td>
+                    <td class="border-[2px] border-blue-700 p-4 text-center blue-text text-sm">5%</td>
+                    <td id="outVatAmt" class="border-[2px] border-blue-700 p-4 text-right"></td>
+                    <td id="outLineTotal" class="border-[2px] border-blue-700 p-4 text-right"></td>
+                </tr>
+            </tbody>
         </table>
 
-        <div class="flex justify-end mt-4">
-            <div class="w-48 border border-blue-800 p-2 space-y-1 text-sm font-bold">
-                <div class="flex justify-between"><span>Subtotal:</span><span id="rSub"></span></div>
-                <div class="flex justify-between"><span>VAT:</span><span id="rVat2"></span></div>
-                <div class="flex justify-between border-t border-blue-800 pt-1 text-lg"><span>Total:</span><span id="rFinal"></span></div>
+        <div class="flex justify-end mt-1">
+            <div class="w-80 blue-text font-bold border-[3px] border-blue-700 bg-white">
+                <div class="flex justify-between p-2 border-b-2 border-blue-700">
+                    <span class="text-xs uppercase">Total Before VAT</span>
+                    <span id="outSubtotal" class="text-black text-lg"></span>
+                </div>
+                <div class="flex justify-between p-2 border-b-2 border-blue-700">
+                    <span class="text-xs uppercase">VAT Incl.</span>
+                    <span id="outVatFinal" class="text-black text-lg"></span>
+                </div>
+                <div class="flex justify-between p-2 border-b-2 border-blue-700">
+                    <span class="text-xs uppercase">Total Amount</span>
+                    <span id="outTotalFinal" class="text-black text-lg"></span>
+                </div>
+                <div class="flex justify-between p-2 border-b-2 border-blue-700 bg-yellow-50">
+                    <span class="text-xs uppercase">Advance</span>
+                    <span id="outAdvance" class="text-black text-lg"></span>
+                </div>
+                <div class="flex justify-between p-2 bg-blue-700 text-white font-black">
+                    <span class="text-sm uppercase">Balance</span>
+                    <span id="outBalance" class="text-white text-xl"></span>
+                </div>
             </div>
         </div>
-        <div class="mt-8 text-center text-xl font-bold italic">Thank You</div>
+
+        <div class="mt-20 text-center blue-text">
+            <p class="text-4xl font-black italic tracking-widest">Thank You</p>
+            <div class="mt-10 flex justify-between px-10">
+                <div class="border-t border-blue-700 w-40 mt-4 text-[10px]">Signature</div>
+                <div class="border-t border-blue-700 w-40 mt-4 text-[10px]">Customer Signature</div>
+            </div>
+        </div>
     </div>
 
     <script>
-        function updateAndDownload() {
-            const q = parseFloat(document.getElementById('qty').value) || 0;
-            const p = parseFloat(document.getElementById('prc').value) || 0;
-            const sub = q * p;
-            const v = sub * 0.05;
-            const total = sub + v;
+        function updateAll() {
+            const q = parseFloat(document.getElementById('inQty').value) || 0;
+            const p = parseFloat(document.getElementById('inPrice').value) || 0;
+            const adv = parseFloat(document.getElementById('inAdvance').value) || 0;
+            
+            const subtotal = q * p;
+            const vat = subtotal * 0.05;
+            const total = subtotal + vat;
+            const balance = total - adv;
 
-            document.getElementById('rCust').innerText = document.getElementById('cust').value;
-            document.getElementById('rPart').innerText = document.getElementById('part').value;
-            document.getElementById('rQty').innerText = q;
-            document.getElementById('rVat').innerText = v.toFixed(2);
-            document.getElementById('rVat2').innerText = v.toFixed(2);
-            document.getElementById('rTotal').innerText = total.toFixed(2);
-            document.getElementById('rSub').innerText = sub.toFixed(2);
-            document.getElementById('rFinal').innerText = total.toFixed(2);
-            document.getElementById('rDate').innerText = new Date().toLocaleDateString();
+            document.getElementById('outCust').innerText = document.getElementById('inCust').value;
+            document.getElementById('outPart').innerText = document.getElementById('inPart').value;
+            document.getElementById('outQty').innerText = q > 0 ? q : '';
+            document.getElementById('outDate').innerText = document.getElementById('inDate').value;
+            document.getElementById('outDeliv').innerText = document.getElementById('inDeliv').value;
+            
+            document.getElementById('outVatAmt').innerText = vat > 0 ? vat.toFixed(2) : '';
+            document.getElementById('outLineTotal').innerText = total > 0 ? total.toFixed(2) : '';
+            
+            document.getElementById('outSubtotal').innerText = subtotal.toFixed(2);
+            document.getElementById('outVatFinal').innerText = vat.toFixed(2);
+            document.getElementById('outTotalFinal').innerText = total.toFixed(2);
+            document.getElementById('outAdvance').innerText = adv.toFixed(2);
+            document.getElementById('outBalance').innerText = balance.toFixed(2);
+        }
 
-            const opt = { margin: 10, filename: 'invoice.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-            html2pdf().set(opt).from(document.getElementById('receipt')).save();
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', updateAll);
+        });
+
+        function downloadPDF() {
+            const element = document.getElementById('receipt-area');
+            const opt = {
+                margin: 0,
+                filename: 'Karim_Invoice.pdf',
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 3, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
         }
     </script>
-
-    <style> @media screen { #receipt { display: none; } } </style>
 </body>
 </html>
