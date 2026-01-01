@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Karim Tailoring</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body class="bg-slate-50 font-sans">
+
+    <div class="p-6 max-w-md mx-auto no-print">
+        <h1 class="text-2xl font-bold text-blue-900 mb-6">New Invoice</h1>
+        <div class="bg-white p-6 rounded-2xl shadow-sm space-y-4">
+            <input id="cust" type="text" placeholder="Customer Name" class="w-full p-4 bg-gray-50 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+            <input id="part" type="text" placeholder="Particulars (e.g. 4 Set Suit)" class="w-full p-4 bg-gray-50 rounded-xl outline-none">
+            <div class="flex gap-4">
+                <input id="qty" type="number" placeholder="Qty" class="w-1/2 p-4 bg-gray-50 rounded-xl outline-none">
+                <input id="prc" type="number" placeholder="Price" class="w-1/2 p-4 bg-gray-50 rounded-xl outline-none">
+            </div>
+            <button onclick="updateAndDownload()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
+                Download Blue Receipt
+            </button>
+        </div>
+    </div>
+
+    <div id="receipt" class="bg-white p-8 w-[210mm] mx-auto" style="border: 2px solid #0055A4; color: #0055A4;">
+        <div class="flex justify-between items-start">
+            <div class="text-[10px] leading-tight">
+                Mob: 050 894 8579 Karim<br>Mob: 055 909 8427 Jashim<br>P.O. Box: 843, AJMAN
+            </div>
+            <div class="text-center">
+                <h1 class="text-3xl font-black italic italic uppercase tracking-tighter">KARIM TAILORING</h1>
+                <p class="text-[10px] font-bold">OSMAN BIN AFFAN STREET | TAX INVOICE</p>
+            </div>
+            <div class="text-red-600 font-bold">No. 26904</div>
+        </div>
+        
+        <div class="h-[2px] bg-blue-800 my-4"></div>
+        
+        <div class="flex justify-between mb-4">
+            <div class="font-bold">M/s. <span id="rCust" class="border-b border-blue-800 min-w-[300px] inline-block"></span></div>
+            <div>Date: <span id="rDate"></span></div>
+        </div>
+
+        <table class="w-full border border-blue-800">
+            <tr class="bg-blue-50">
+                <th class="border border-blue-800 p-2">Qty</th>
+                <th class="border border-blue-800 p-2">Particulars</th>
+                <th class="border border-blue-800 p-2">VAT (5%)</th>
+                <th class="border border-blue-800 p-2">Total (Dhs)</th>
+            </tr>
+            <tr class="h-48">
+                <td id="rQty" class="border border-blue-800 p-2 text-center"></td>
+                <td id="rPart" class="border border-blue-800 p-2"></td>
+                <td id="rVat" class="border border-blue-800 p-2 text-right"></td>
+                <td id="rTotal" class="border border-blue-800 p-2 text-right"></td>
+            </tr>
+        </table>
+
+        <div class="flex justify-end mt-4">
+            <div class="w-48 border border-blue-800 p-2 space-y-1 text-sm font-bold">
+                <div class="flex justify-between"><span>Subtotal:</span><span id="rSub"></span></div>
+                <div class="flex justify-between"><span>VAT:</span><span id="rVat2"></span></div>
+                <div class="flex justify-between border-t border-blue-800 pt-1 text-lg"><span>Total:</span><span id="rFinal"></span></div>
+            </div>
+        </div>
+        <div class="mt-8 text-center text-xl font-bold italic">Thank You</div>
+    </div>
+
+    <script>
+        function updateAndDownload() {
+            const q = parseFloat(document.getElementById('qty').value) || 0;
+            const p = parseFloat(document.getElementById('prc').value) || 0;
+            const sub = q * p;
+            const v = sub * 0.05;
+            const total = sub + v;
+
+            document.getElementById('rCust').innerText = document.getElementById('cust').value;
+            document.getElementById('rPart').innerText = document.getElementById('part').value;
+            document.getElementById('rQty').innerText = q;
+            document.getElementById('rVat').innerText = v.toFixed(2);
+            document.getElementById('rVat2').innerText = v.toFixed(2);
+            document.getElementById('rTotal').innerText = total.toFixed(2);
+            document.getElementById('rSub').innerText = sub.toFixed(2);
+            document.getElementById('rFinal').innerText = total.toFixed(2);
+            document.getElementById('rDate').innerText = new Date().toLocaleDateString();
+
+            const opt = { margin: 10, filename: 'invoice.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+            html2pdf().set(opt).from(document.getElementById('receipt')).save();
+        }
+    </script>
+
+    <style> @media screen { #receipt { display: none; } } </style>
+</body>
+</html>
